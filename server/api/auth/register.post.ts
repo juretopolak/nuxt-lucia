@@ -37,8 +37,9 @@ export default eventHandler(async (event) => {
         statusCode: 409
       });
     }
+    console.log(e)
     throw createError({
-      message: e,
+      message: 'An unknown error occurred.',
       statusCode: 500
     });
   }
