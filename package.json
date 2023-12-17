@@ -1,0 +1,33 @@
+{
+  "name": "nuxt-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "db:migrate": "drizzle-kit generate:sqlite",
+    "db:push": "drizzle-kit push:sqlite",
+    "db:studio": "drizzle-kit studio",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.1.1",
+    "@types/better-sqlite3": "^7.6.8",
+    "drizzle-kit": "^0.20.6",
+    "nuxt": "^3.8.2"
+  },
+  "dependencies": {
+    "@lucia-auth/adapter-sqlite": "^2.0.1",
+    "@nuxt/ui": "^2.11.0",
+    "@pinia/nuxt": "^0.5.1",
+    "better-sqlite3": "^9.1.1",
+    "drizzle-orm": "^0.29.0",
+    "eslint": "^8.54.0",
+    "lucia": "^2.7.4",
+    "zod": "^3.22.4"
+  }
+}
