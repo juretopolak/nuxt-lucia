@@ -1,5 +1,5 @@
 [[d1_databases]]
 binding = "DB"
-database_id = "65c55510-a162-4d20-b70f-ad54b5a624c4"
-database_name = "nuxt-ui"
+database_id = "f88539a2-1971-4901-b562-3e522a86f521"
+database_name = "nuxt-lucia"
 migrations_dir = "./server/db/migrations"
