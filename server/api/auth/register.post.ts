@@ -18,7 +18,8 @@ export default eventHandler(async (event) => {
         password: user.password
       },
       attributes: {
-        email: user.email
+        email: user.email,
+        name: user.name
       },
     });
     const session = await auth.createSession({
@@ -29,9 +30,7 @@ export default eventHandler(async (event) => {
     authRequest.setSession(session)
     return newUser.userId
   } catch (e) {
-    if (
-      e instanceof LuciaError && e.message === 'AUTH_DUPLICATE_KEY_ID'
-    ) {
+    if (e instanceof LuciaError && e.message === 'AUTH_DUPLICATE_KEY_ID') {
       throw createError({
         message: 'Email already in use.',
         statusCode: 409
