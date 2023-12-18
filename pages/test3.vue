@@ -4,7 +4,7 @@ const user = ref({
   password: '',
 })
 
-const userLogin = async () => {
+async function userLogin() {
   const toast = useToast()
   try {
     await $fetch('/api/auth/login', {
@@ -15,14 +15,15 @@ const userLogin = async () => {
     toast.add({
       title: 'Login successful.',
       icon: 'i-heroicons-check-circle-20-solid',
-      color: 'green'
+      color: 'green',
     })
-  } catch (e) {
+  }
+  catch (e) {
     toast.add({
-      // @ts-ignore
+      // @ts-expect-error
       title: e.data.message,
       icon: 'i-heroicons-exclamation-triangle-20-solid',
-      color: 'red'
+      color: 'red',
     })
   }
 }

@@ -2,12 +2,13 @@
 const { data: user } = useFetch('/api/auth/user', {
   method: 'GET',
 })
-const logout = async () => {
+async function logout() {
   try {
     await $fetch('/api/auth/logout', {
       method: 'POST',
     })
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error)
   }
 
@@ -23,9 +24,13 @@ const logout = async () => {
       </template>
       <div v-if="user">
         Hello, {{ user.email }}
-        <UButton @click="logout">Logout</UButton>
+        <UButton @click="logout">
+          Logout
+        </UButton>
       </div>
-      <div v-else>User not logged in.</div>
+      <div v-else>
+        User not logged in.
+      </div>
     </UCard>
   </div>
 </template>

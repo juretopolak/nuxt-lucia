@@ -8,7 +8,7 @@ import { join } from 'pathe'
 const tables = {
   user: 'users',
   key: 'user_keys',
-  session: 'user_sessions'
+  session: 'user_sessions',
 }
 
 let adapter
@@ -16,19 +16,21 @@ let adapter
 if (process.env.DB) {
   // d1 in production
   adapter = d1(process.env.DB, tables)
-} else if (process.dev) {
+}
+else if (process.dev) {
   // local sqlite in development
   const { dbDir } = useRuntimeConfig()
   const sqlite = new Database(join(dbDir, './db.sqlite'))
   adapter = betterSqlite3(sqlite, tables)
-} else {
+}
+else {
   throw new Error('No database configured for production')
 }
 
 export const auth = lucia({
   env: process.dev ? 'DEV' : 'PROD',
   middleware: h3(),
-  adapter
-});
+  adapter,
+})
 
-export type Auth = typeof auth;
+export type Auth = typeof auth

@@ -3,25 +3,26 @@ const links = ref([
   {
     label: 'Home',
     icon: 'i-heroicons-home-solid',
-    to: '/'
+    to: '/',
   },
   {
     label: 'List Users',
     icon: 'i-heroicons-users-solid',
-    to: '/test'
+    to: '/test',
   },
   {
     label: 'Register',
     icon: 'i-heroicons-users-solid',
-    to: '/register'
+    to: '/register',
   },
   {
     label: 'Login',
     icon: 'i-heroicons-users-solid',
-    to: '/login'
-  }
+    to: '/login',
+  },
 ])
 </script>
+
 <template>
   <div>
     <UVerticalNavigation :links="links" :ui="{ padding: 'p-3' }">

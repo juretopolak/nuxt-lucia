@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const authRequest = auth.handleRequest(event)
@@ -8,8 +8,8 @@ export default defineEventHandler(async (event) => {
   if (!userId) {
     throw createError({
       message: 'Not logged in.',
-      statusCode: 401
-    });
+      statusCode: 401,
+    })
   }
 
   const user = useDb()
@@ -19,5 +19,4 @@ export default defineEventHandler(async (event) => {
     .get()
 
   return user
-
-});
+})

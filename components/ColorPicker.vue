@@ -1,3 +1,36 @@
+<script setup lang="ts">
+import colors from '#tailwind-config/theme/colors'
+
+const appConfig = useAppConfig()
+const colorMode = useColorMode()
+
+// Computed
+
+const primaryColors = computed(() => appConfig.ui.colors.filter(color => color !== 'primary').map(color => ({ value: color, text: color, hex: colors[color][colorMode.value === 'dark' ? 400 : 500] })))
+const primary = computed({
+  get() {
+    return primaryColors.value.find(option => option.value === appConfig.ui.primary)
+  },
+  set(option) {
+    appConfig.ui.primary = option!.value
+
+    window.localStorage.setItem('nuxt-ui-primary', appConfig.ui.primary)
+  },
+})
+
+const grayColors = computed(() => ['slate', 'cool', 'zinc', 'neutral', 'stone'].map(color => ({ value: color, text: color, hex: colors[color][colorMode.value === 'dark' ? 400 : 500] })))
+const gray = computed({
+  get() {
+    return grayColors.value.find(option => option.value === appConfig.ui.gray)
+  },
+  set(option) {
+    appConfig.ui.gray = option!.value
+
+    window.localStorage.setItem('nuxt-ui-gray', appConfig.ui.gray)
+  },
+})
+</script>
+
 <template>
   <UPopover mode="hover">
     <template #default="{ open }">
@@ -42,36 +75,3 @@
     </template>
   </UPopover>
 </template>
-
-<script setup lang="ts">
-import colors from '#tailwind-config/theme/colors'
-
-const appConfig = useAppConfig()
-const colorMode = useColorMode()
-
-// Computed
-
-const primaryColors = computed(() => appConfig.ui.colors.filter(color => color !== 'primary').map(color => ({ value: color, text: color, hex: colors[color][colorMode.value === 'dark' ? 400 : 500] })))
-const primary = computed({
-  get () {
-    return primaryColors.value.find(option => option.value === appConfig.ui.primary)
-  },
-  set (option) {
-    appConfig.ui.primary = option!.value
-
-    window.localStorage.setItem('nuxt-ui-primary', appConfig.ui.primary)
-  }
-})
-
-const grayColors = computed(() => ['slate', 'cool', 'zinc', 'neutral', 'stone'].map(color => ({ value: color, text: color, hex: colors[color][colorMode.value === 'dark' ? 400 : 500] })))
-const gray = computed({
-  get () {
-    return grayColors.value.find(option => option.value === appConfig.ui.gray)
-  },
-  set (option) {
-    appConfig.ui.gray = option!.value
-
-    window.localStorage.setItem('nuxt-ui-gray', appConfig.ui.gray)
-  }
-})
-</script>

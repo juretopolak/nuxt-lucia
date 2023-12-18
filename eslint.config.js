@@ -1,3 +1,10 @@
-const antfu = require('@antfu/eslint-config').default
+import antfu from '@antfu/eslint-config'
 
-module.exports = antfu()
+export default antfu(
+  {
+    // Without `files`, they are general rules for all files
+    rules: {
+      'no-console': 'off',
+    },
+  },
+)

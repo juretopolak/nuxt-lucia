@@ -8,7 +8,7 @@ const user = ref({
 
 const loading = ref(false)
 
-const userLogin = async () => {
+async function userLogin() {
   loading.value = true
   const toast = useToast()
   try {
@@ -21,21 +21,22 @@ const userLogin = async () => {
     toast.add({
       title: 'Login successful.',
       icon: 'i-heroicons-check-circle-20-solid',
-      color: 'green'
+      color: 'green',
     })
-  } catch (e) {
+  }
+  catch (e) {
     if (e instanceof FetchError) {
       toast.add({
         title: e.data.message,
         icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red'
+        color: 'red',
       })
     }
     else {
       toast.add({
         title: 'Something went wrong. Check console',
         icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red'
+        color: 'red',
       })
       console.log(e)
     }

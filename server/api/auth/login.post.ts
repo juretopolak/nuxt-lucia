@@ -14,23 +14,24 @@ export default eventHandler(async (event) => {
     const key = await auth.useKey('email', user.email.toLowerCase(), user.password)
     const session = await auth.createSession({
       userId: key.userId,
-      attributes: {}
+      attributes: {},
     })
     const authRequest = auth.handleRequest(event)
     authRequest.setSession(session)
     return key.userId
-  } catch (e) {
+  }
+  catch (e) {
     console.log(e)
     if (e instanceof LuciaError && (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')) {
       // user does not exist or password is incorrect
       throw createError({
         message: 'Incorrect username or password.',
-        statusCode: 400
+        statusCode: 400,
       })
     }
     throw createError({
       message: 'An unknown error occurred.',
-      statusCode: 500
+      statusCode: 500,
     })
   }
 })

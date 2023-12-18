@@ -9,25 +9,25 @@ const user = ref({
 
 const loading = ref(false)
 
-const userRegistration = async () => {
+async function userRegistration() {
   loading.value = true
   const toast = useToast()
   try {
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: user.value
+      body: user.value,
     })
     toast.add({
       title: 'Registration sussesfull.',
       icon: 'i-heroicons-check-circle-20-solid',
-      color: 'green'
+      color: 'green',
     })
 
     await navigateTo('/')
     toast.add({
       title: 'You are now logged in.',
       icon: 'i-heroicons-check-circle-20-solid',
-      color: 'green'
+      color: 'green',
     })
   }
   catch (e) {
@@ -35,14 +35,14 @@ const userRegistration = async () => {
       toast.add({
         title: e.data.message,
         icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red'
+        color: 'red',
       })
     }
     else {
       toast.add({
         title: 'Something went wrong. Check console',
         icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red'
+        color: 'red',
       })
       console.log(e)
     }
@@ -73,7 +73,6 @@ const userRegistration = async () => {
       <UButton :loading="loading" class="mt-4" size="lg" @click="userRegistration">
         Register
       </UButton>
-
     </UCard>
   </div>
 </template>

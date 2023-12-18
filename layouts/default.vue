@@ -1,6 +1,7 @@
 <template>
   <header
-    class="bg-background/75 backdrop-blur border-b -mb-px sticky top-0 z-50 border-primary-200/75 dark:border-primary-900/50">
+    class="bg-background/75 backdrop-blur border-b -mb-px sticky top-0 z-50 border-primary-200/75 dark:border-primary-900/50"
+  >
     <div class="flex justify-start mx-auto px-4 py-2 sm:px-6 lg:px-8 max-w-7xl h-12">
       <div class="flex-1">
         <div class="h-full">

@@ -15,31 +15,32 @@ export default eventHandler(async (event) => {
       key: {
         providerId: 'email',
         providerUserId: user.email,
-        password: user.password
+        password: user.password,
       },
       attributes: {
         email: user.email,
-        name: user.name
+        name: user.name,
       },
-    });
+    })
     const session = await auth.createSession({
       userId: newUser.userId,
-      attributes: {}
+      attributes: {},
     })
     const authRequest = auth.handleRequest(event)
     authRequest.setSession(session)
     return newUser.userId
-  } catch (e) {
+  }
+  catch (e) {
     if (e instanceof LuciaError && e.message === 'AUTH_DUPLICATE_KEY_ID') {
       throw createError({
         message: 'Email already in use.',
-        statusCode: 409
-      });
+        statusCode: 409,
+      })
     }
     console.log(e)
     throw createError({
       message: 'An unknown error occurred.',
-      statusCode: 500
-    });
+      statusCode: 500,
+    })
   }
 })
