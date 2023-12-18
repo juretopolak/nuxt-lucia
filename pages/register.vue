@@ -7,7 +7,10 @@ const user = ref({
   password: 'jure',
 })
 
+const loading = ref(false)
+
 const userRegistration = async () => {
+  loading.value = true
   const toast = useToast()
   try {
     await $fetch('/api/auth/register', {
@@ -34,10 +37,17 @@ const userRegistration = async () => {
         icon: 'i-heroicons-exclamation-triangle-20-solid',
         color: 'red'
       })
-      return
     }
-    alert(e)
+    else {
+      toast.add({
+        title: 'Something went wrong. Check console',
+        icon: 'i-heroicons-exclamation-triangle-20-solid',
+        color: 'red'
+      })
+      console.log(e)
+    }
   }
+  loading.value = false
 }
 </script>
 
@@ -60,9 +70,10 @@ const userRegistration = async () => {
         <UInput v-model="user.password" type="password" placeholder="Password" icon="i-heroicons-lock-closed" />
       </UFormGroup>
 
-      <UButton class="mt-4" size="lg" @click="userRegistration">
+      <UButton :loading="loading" class="mt-4" size="lg" @click="userRegistration">
         Register
       </UButton>
+
     </UCard>
   </div>
 </template>
