@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: user } = useFetch('/api/auth/user', {
+const { data: user } = await useFetch('/api/auth/user', {
   method: 'GET',
 })
 async function logout() {
