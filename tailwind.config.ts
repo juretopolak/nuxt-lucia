@@ -9,4 +9,7 @@ export default <Partial<Config>>{
       },
     },
   },
+  content: [
+    './stores/**/*.{js,ts}',
+  ],
 }
