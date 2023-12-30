@@ -1,48 +1,10 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
-
-const user = ref({
+const user = ref<UserLoginInput>({
   email: 'jure@test.com',
   password: 'jure',
 })
 
-const loading = ref(false)
-
-async function userLogin() {
-  loading.value = true
-  const toast = useToast()
-  try {
-    await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: user.value,
-    })
-
-    await navigateTo('/')
-    toast.add({
-      title: 'Login successful.',
-      icon: 'i-heroicons-check-circle-20-solid',
-      color: 'green',
-    })
-  }
-  catch (e) {
-    if (e instanceof FetchError) {
-      toast.add({
-        title: e.data.message,
-        icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red',
-      })
-    }
-    else {
-      toast.add({
-        title: 'Something went wrong. Check console',
-        icon: 'i-heroicons-exclamation-triangle-20-solid',
-        color: 'red',
-      })
-      console.log(e)
-    }
-  }
-  loading.value = false
-}
+const auth = useAuthStore()
 </script>
 
 <template>
@@ -60,7 +22,7 @@ async function userLogin() {
         <UInput v-model="user.password" type="password" placeholder="Password" icon="i-heroicons-lock-closed" />
       </UFormGroup>
 
-      <UButton :loading="loading" class="mt-4" size="lg" @click="userLogin">
+      <UButton :loading="auth.loading" class="mt-4" size="lg" @click="auth.userLogin(user)">
         Login
       </UButton>
     </UCard>

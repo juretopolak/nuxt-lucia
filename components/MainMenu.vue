@@ -8,12 +8,12 @@ const links = ref([
   {
     label: 'List Users',
     icon: 'i-heroicons-users-solid',
-    to: '/test',
+    to: '/users',
   },
   {
-    label: 'Register',
+    label: 'Signup',
     icon: 'i-heroicons-users-solid',
-    to: '/register',
+    to: '/signup',
   },
   {
     label: 'Login',

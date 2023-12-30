@@ -31,6 +31,10 @@ export const auth = lucia({
   env: process.dev ? 'DEV' : 'PROD',
   middleware: h3(),
   adapter,
+  sessionExpiresIn: {
+    activePeriod: 1 * 60 * 60 * 1000, // 1 hour after creating session
+    idlePeriod: 23 * 60 * 60 * 1000, // 24 hours after creating session
+  },
 })
 
 export type Auth = typeof auth

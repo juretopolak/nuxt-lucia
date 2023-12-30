@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.1",
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
     "@types/better-sqlite3": "^7.6.8",
     "drizzle-kit": "^0.20.9",
     "eslint": "^8.56.0",

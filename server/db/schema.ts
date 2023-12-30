@@ -1,4 +1,4 @@
-import type { InferInsertModel } from 'drizzle-orm'
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { blob, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -29,3 +29,4 @@ export const userKeys = sqliteTable('user_keys', {
 })
 
 export type InsertUser = InferInsertModel<typeof users>
+export type SelectUser = InferSelectModel<typeof users>

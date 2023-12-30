@@ -1,19 +1,5 @@
 <script setup lang="ts">
-const { data: user } = await useFetch('/api/auth/user', {
-  method: 'GET',
-})
-async function logout() {
-  try {
-    await $fetch('/api/auth/logout', {
-      method: 'POST',
-    })
-  }
-  catch (error) {
-    console.log(error)
-  }
-
-  await navigateTo('/login')
-}
+const auth = useAuthStore()
 </script>
 
 <template>
@@ -22,9 +8,9 @@ async function logout() {
       <template #header>
         Home
       </template>
-      <div v-if="user">
-        Hello, {{ user.email }}
-        <UButton @click="logout">
+      <div v-if="auth.user">
+        Hello, {{ auth.user?.email }}
+        <UButton @click="auth.userLogout()">
           Logout
         </UButton>
       </div>
