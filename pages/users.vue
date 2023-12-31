@@ -10,9 +10,23 @@ const columns = [
 
 async function deleteUser(id: string) {
   const { data: deletedUser } = await useFetch(`/api/users/${id}`, { method: 'DELETE' })
+  const toast = useToast()
 
-  if (deletedUser.value && users.value)
+  if (deletedUser.value && users.value) {
     users.value = users.value.filter(user => user.id !== deletedUser.value?.id)
+    toast.add({
+      title: `User ${deletedUser.value.name} deleted.`,
+      icon: 'i-heroicons-check-circle-20-solid',
+      color: 'green',
+    })
+  }
+  else {
+    toast.add({
+      title: 'Something went wrong.',
+      icon: 'i-heroicons-exclamation-triangle-20-solid',
+      color: 'red',
+    })
+  }
 }
 </script>
 
