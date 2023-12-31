@@ -5,8 +5,6 @@ export default defineEventHandler(async (event) => {
   const session = await authRequest.validate()
   const userId = session?.user.userId
 
-  console.log(session)
-
   if (!userId) {
     throw createError({
       message: 'Not logged in.',
@@ -19,8 +17,6 @@ export default defineEventHandler(async (event) => {
     .from(models.users)
     .where(eq(models.users.id, userId))
     .get()
-
-  console.log(session.activePeriodExpiresAt)
 
   return {
     ...user,
