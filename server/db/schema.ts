@@ -11,7 +11,7 @@ export const userSessions = sqliteTable('user_sessions', {
   id: text('id').primaryKey(),
   userId: text('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   activeExpires: blob('active_expires', {
     mode: 'bigint',
   }).notNull(),
@@ -24,7 +24,7 @@ export const userKeys = sqliteTable('user_keys', {
   id: text('id').primaryKey(),
   userId: text('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   hashedPassword: text('hashed_password'),
 })
 
