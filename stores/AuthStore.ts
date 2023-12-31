@@ -54,6 +54,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
   async function userLogin(userInput: UserLoginInput) {
     loading.value = true
     try {
+      // Create a session on the server
       await $fetch('/api/auth/login', {
         method: 'POST',
         body: userInput,
@@ -64,6 +65,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
         icon: 'i-heroicons-check-circle-20-solid',
         color: 'green',
       })
+      // Get the authenticated user with session data
       getAuthenticatedUser()
     }
     catch (e) {

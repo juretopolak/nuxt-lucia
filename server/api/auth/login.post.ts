@@ -7,17 +7,19 @@ export default eventHandler(async (event) => {
     email: z.string().email(),
     password: z.string().min(1),
   })
-  const user = await readValidatedBody(event, userSchema.parse)
+  const userData = await readValidatedBody(event, userSchema.parse)
 
   try {
     // find user by key and validate password
-    const key = await auth.useKey('email', user.email.toLowerCase(), user.password)
+    const key = await auth.useKey('email', userData.email.toLowerCase(), userData.password)
     const session = await auth.createSession({
       userId: key.userId,
       attributes: {},
     })
+
     const authRequest = auth.handleRequest(event)
     authRequest.setSession(session)
+
     return key.userId
   }
   catch (e) {
