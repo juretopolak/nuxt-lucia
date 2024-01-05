@@ -1,4 +1,12 @@
 {
+  // Tailwind IntelliSense
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
   // Enable the ESlint flat config support
   "eslint.experimental.useFlatConfig": true,
 
