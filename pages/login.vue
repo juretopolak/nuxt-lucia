@@ -25,6 +25,18 @@ const auth = useAuthStore()
       <UButton :loading="auth.loading" class="mt-4" size="lg" @click="auth.userLogin(user)">
         Login
       </UButton>
+
+      <UDivider label="OR" />
+
+      <UButton
+        to="/api/oauth/github/login"
+        class="mt-4"
+        size="lg"
+        icon="i-mdi-github"
+        external
+      >
+        Login with GitHub
+      </UButton>
     </UCard>
   </div>
 </template>

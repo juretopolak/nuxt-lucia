@@ -16,7 +16,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@iconify-json/mdi": "^1.1.64",
     "@lucia-auth/adapter-sqlite": "^2.0.1",
+    "@lucia-auth/oauth": "^3.5.0",
     "@nuxt/ui": "^2.11.1",
     "@pinia/nuxt": "^0.5.1",
     "better-sqlite3": "^9.2.2",

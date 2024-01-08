@@ -4,6 +4,7 @@ import { lucia } from 'lucia'
 import { h3 } from 'lucia/middleware'
 import 'lucia/polyfill/node'
 import { join } from 'pathe'
+import { github } from '@lucia-auth/oauth/providers'
 
 const tables = {
   user: 'users',
@@ -31,10 +32,22 @@ export const auth = lucia({
   env: process.dev ? 'DEV' : 'PROD',
   middleware: h3(),
   adapter,
+  getUserAttributes: (data) => {
+    return {
+      githubUsername: data.username,
+    }
+  },
   sessionExpiresIn: {
     activePeriod: 1 * 60 * 60 * 1000, // 1 hour after creating session
     idlePeriod: 23 * 60 * 60 * 1000, // 24 hours after creating session
   },
+})
+
+const runtimeConfig = useRuntimeConfig()
+
+export const githubAuth = github(auth, {
+  clientId: runtimeConfig.githubClientId,
+  clientSecret: runtimeConfig.githubClientSecret,
 })
 
 export type Auth = typeof auth

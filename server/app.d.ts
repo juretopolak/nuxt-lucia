@@ -3,7 +3,8 @@ declare namespace Lucia {
   type Auth = import('./utils/auth').Auth
   interface DatabaseUserAttributes {
     email: string
-    name: string
+    username: string | null
+    name: string | null
   }
   interface DatabaseSessionAttributes {}
 }

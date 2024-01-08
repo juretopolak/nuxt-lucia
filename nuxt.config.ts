@@ -13,8 +13,13 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     dbDir: resolve('./server/db'),
+    githubClientId: '',
+    githubClientSecret: '',
   },
   nitro: {
     moduleSideEffects: ['lucia/polyfill/node'],
+  },
+  ui: {
+    icons: ['mdi'],
   },
 })
