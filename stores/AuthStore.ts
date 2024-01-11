@@ -108,6 +108,10 @@ export const useAuthStore = defineStore('AuthStore', () => {
       return user.value
     }
     catch (e) {
+      // Don't show for expired session if there is no user
+      if (!user.value)
+        return
+
       user.value = null
       toast.add({
         title: 'Session expired. Please login again...',
