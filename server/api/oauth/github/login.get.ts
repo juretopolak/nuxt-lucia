@@ -4,7 +4,7 @@ export default eventHandler(async (event) => {
     httpOnly: true,
     secure: !process.dev,
     path: '/',
-    maxAge: 60 * 60,
+    maxAge: 24 * 60 * 60,
   })
   return sendRedirect(event, url.toString())
 })
