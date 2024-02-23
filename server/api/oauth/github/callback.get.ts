@@ -1,5 +1,4 @@
 import { OAuth2RequestError } from 'arctic'
-import { serializeCookie } from 'oslo/cookie'
 import { generateId } from 'lucia'
 import { and, eq } from 'drizzle-orm'
 import { H3Error } from 'h3'
@@ -80,11 +79,11 @@ export default defineEventHandler(async (event) => {
       })
     }
     else {
+      console.log(e)
       throw createError({
         status: 500,
         message: 'Unknown error.',
       })
-      console.log(e)
     }
   }
 })
