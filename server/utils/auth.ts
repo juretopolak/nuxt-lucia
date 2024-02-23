@@ -3,7 +3,6 @@ import { BetterSqlite3Adapter, D1Adapter } from '@lucia-auth/adapter-sqlite'
 import Database from 'better-sqlite3'
 import { Lucia, TimeSpan } from 'lucia'
 import { GitHub } from 'arctic'
-import 'lucia/polyfill/node'
 import { join } from 'pathe'
 import type { SelectUser } from '~/server/db/schema'
 
