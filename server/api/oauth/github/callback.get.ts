@@ -1,69 +1,90 @@
-import { OAuthRequestError } from '@lucia-auth/oauth'
+import { OAuth2RequestError } from 'arctic'
+import { serializeCookie } from 'oslo/cookie'
+import { generateId } from 'lucia'
+import { and, eq } from 'drizzle-orm'
+import { H3Error } from 'h3'
 
-export default eventHandler(async (event) => {
-  const storedState = getCookie(event, 'github_oauth_state')
+export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const state = query.state?.toString()
-  const code = query.code?.toString()
-  // validate state
-  if (!storedState || !state || storedState !== state || !code) {
-    return sendError(
-      event,
-      createError({
-        statusCode: 400,
-      }),
-    )
+  const code = query.code?.toString() ?? null
+  const state = query.state?.toString() ?? null
+  const storedState = getCookie(event, 'github_oauth_state') ?? null
+  if (!code || !state || !storedState || state !== storedState) {
+    throw createError({
+      status: 400,
+    })
   }
+
   try {
-    const { getExistingUser, githubUser, createUser } = await githubAuth.validateCallback(code)
+    const tokens = await github.validateAuthorizationCode(code)
+    const githubUserResponse = await fetch('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken}`,
+      },
+    })
+    const githubUser: GitHubUser = await githubUserResponse.json()
 
-    console.log(githubUser)
+    const existingUser = await useDb()
+      .select()
+      .from(models.oauthAccounts)
+      .where(
+        and(
+          eq(models.oauthAccounts.providerId, 'github'),
+          eq(models.oauthAccounts.providerUserId, githubUser.id),
+        ),
+      )
+      .get()
 
-    const getUser = async () => {
-      const existingUser = await getExistingUser()
-      if (existingUser)
-        return existingUser
-      if (!githubUser.email) {
-        throw createError({
-          message: 'Email is required.',
-          statusCode: 400,
-        })
-      }
-      const user = await createUser({
-        attributes: {
-          email: githubUser.email,
-          username: githubUser.login,
-          name: githubUser.name,
-        },
-      })
-      return user
+    if (existingUser) {
+      const session = await auth.createSession(existingUser.userId, {})
+      appendHeader(event, 'Set-Cookie', auth.createSessionCookie(session.id).serialize())
+      return sendRedirect(event, '/')
     }
 
-    const user = await getUser()
-    const session = await auth.createSession({
-      userId: user.userId,
-      attributes: {},
-    })
-    const authRequest = auth.handleRequest(event)
-    authRequest.setSession(session)
-    return sendRedirect(event, '/') // redirect to profile page
+    const email = (githubUser.email.length > 0) ? githubUser.email : null
+
+    const userId = generateId(15)
+
+    await useDb()
+      .insert(models.users)
+      .values({
+        id: userId,
+        name: githubUser.name,
+        email,
+      })
+
+    await useDb()
+      .insert(models.oauthAccounts)
+      .values({
+        userId,
+        providerId: 'github',
+        providerUserId: githubUser.id,
+      })
+
+    const session = await auth.createSession(userId, {})
+    appendHeader(event, 'Set-Cookie', auth.createSessionCookie(session.id).serialize())
+
+    return sendRedirect(event, '/')
   }
   catch (e) {
-    if (e instanceof OAuthRequestError) {
+    if (e instanceof OAuth2RequestError && e.message === 'bad_verification_code') {
       // invalid code
-      return sendError(
-        event,
-        createError({
-          statusCode: 400,
-        }),
-      )
+      throw createError({
+        status: 400,
+      })
     }
-    console.log(e)
-    return sendError(
-      event,
-      createError({
-        statusCode: 500,
-      }),
-    )
+    else if (e instanceof H3Error) {
+      throw createError({
+        status: 500,
+        message: e.message,
+      })
+    }
+    else {
+      throw createError({
+        status: 500,
+        message: 'Unknown error.',
+      })
+      console.log(e)
+    }
   }
 })

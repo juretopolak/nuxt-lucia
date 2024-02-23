@@ -1,5 +1,7 @@
 import { z } from 'zod'
-import { LuciaError } from 'lucia'
+import { SqliteError } from 'better-sqlite3'
+import { generateId } from 'lucia'
+import { Argon2id } from 'oslo/password'
 
 export default eventHandler(async (event) => {
   // Validate the body of the request
@@ -8,30 +10,38 @@ export default eventHandler(async (event) => {
     email: z.string().email(),
     password: z.string(),
   })
-  const user = await readValidatedBody(event, userSchema.parse)
+  const userData = await readValidatedBody(event, userSchema.parse)
+
+  const hashedPassword = await new Argon2id().hash(userData.password)
+  const userId = generateId(32)
 
   try {
-    const newUser = await auth.createUser({
-      key: {
-        providerId: 'email',
-        providerUserId: user.email,
-        password: user.password,
-      },
-      attributes: {
-        email: user.email,
-        name: user.name,
-      },
-    })
-    const session = await auth.createSession({
-      userId: newUser.userId,
-      attributes: {},
-    })
-    const authRequest = auth.handleRequest(event)
-    authRequest.setSession(session)
-    return newUser.userId
+    const user = await useDb()
+      .insert(models.users)
+      .values({
+        ...userData,
+        id: userId,
+        password: hashedPassword,
+      })
+      .returning()
+
+    const session = await auth.createSession(userId, {})
+    appendHeader(event, 'Set-Cookie', auth.createSessionCookie(session.id).serialize())
+
+    if (!user) {
+      throw createError({
+        message: 'Email already in use.',
+        statusCode: 409,
+      })
+      return
+    }
+
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { password, ...userWithoutPassword } = user[0]
+    return userWithoutPassword
   }
   catch (e) {
-    if (e instanceof LuciaError && e.message === 'AUTH_DUPLICATE_KEY_ID') {
+    if (e instanceof SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
       throw createError({
         message: 'Email already in use.',
         statusCode: 409,

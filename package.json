@@ -17,21 +17,22 @@
   },
   "dependencies": {
     "@iconify-json/mdi": "^1.1.64",
-    "@lucia-auth/adapter-sqlite": "^2.0.1",
-    "@lucia-auth/oauth": "^3.5.0",
-    "@nuxt/ui": "^2.11.1",
+    "@lucia-auth/adapter-sqlite": "^3.0.0",
+    "@nuxt/ui": "^2.13.0",
     "@pinia/nuxt": "^0.5.1",
-    "better-sqlite3": "^9.2.2",
-    "drizzle-orm": "^0.29.2",
-    "lucia": "^2.7.6",
+    "arctic": "^1.2.0",
+    "better-sqlite3": "^9.4.1",
+    "drizzle-orm": "^0.29.3",
+    "lucia": "^3.0.1",
+    "oslo": "^1.1.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.1",
+    "@antfu/eslint-config": "^2.6.4",
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
-    "@types/better-sqlite3": "^7.6.8",
-    "drizzle-kit": "^0.20.9",
+    "@types/better-sqlite3": "^7.6.9",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.56.0",
-    "nuxt": "^3.9.0"
+    "nuxt": "^3.10.2"
   }
 }

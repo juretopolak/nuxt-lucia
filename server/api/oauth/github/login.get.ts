@@ -1,10 +1,15 @@
+import { generateState } from 'arctic'
+
 export default eventHandler(async (event) => {
-  const [url, state] = await githubAuth.getAuthorizationUrl()
+  const state = generateState()
+  const url = await github.createAuthorizationURL(state)
+
   setCookie(event, 'github_oauth_state', state, {
-    httpOnly: true,
-    secure: !process.dev,
     path: '/',
-    maxAge: 24 * 60 * 60,
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 60 * 10,
+    sameSite: 'lax',
   })
   return sendRedirect(event, url.toString())
 })

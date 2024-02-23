@@ -1,11 +1,9 @@
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const authRequest = auth.handleRequest(event)
-  const session = await authRequest.validate()
-  const userId = session?.user.userId
+  const session = event.context.session
 
-  if (!userId) {
+  if (!session?.userId) {
     throw createError({
       message: 'Not logged in.',
       statusCode: 401,
@@ -15,14 +13,18 @@ export default defineEventHandler(async (event) => {
   const user = await useDb()
     .select()
     .from(models.users)
-    .where(eq(models.users.id, userId))
+    .where(eq(models.users.id, session.userId))
     .get()
 
-  return {
-    ...user,
-    session: {
-      activePeriodExpiresAt: session.activePeriodExpiresAt,
-      idlePeriodExpiresAt: session.idlePeriodExpiresAt,
-    },
+  if (!user) {
+    throw createError({
+      message: 'User not found by the ID from the session.',
+      statusCode: 404,
+    })
   }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { password, ...userWithoutPassword } = user
+
+  return userWithoutPassword
 })

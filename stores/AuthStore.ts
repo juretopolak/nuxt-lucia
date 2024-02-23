@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { FetchError } from 'ofetch'
 
 export const useAuthStore = defineStore('AuthStore', () => {
-  const user = ref<UserState | null>(null)
+  const user = ref<UserState>(null)
   const loading = ref(false)
   const sessionToastShown = ref(false)
 
@@ -12,24 +12,22 @@ export const useAuthStore = defineStore('AuthStore', () => {
     loading.value = true
     const toast = useToast()
     try {
-      await $fetch('/api/auth/signup', {
+      user.value = await $fetch('/api/auth/signup', {
         method: 'POST',
         body: userInput,
       })
+      await navigateTo('/')
       toast.add({
         title: 'Registration sussesfull.',
         icon: 'i-heroicons-check-circle-20-solid',
         color: 'green',
       })
-
-      getAuthenticatedUser()
-
-      await navigateTo('/')
       toast.add({
         title: 'You are now logged in.',
         icon: 'i-heroicons-check-circle-20-solid',
         color: 'green',
       })
+      getAuthenticatedUser()
     }
     catch (e) {
       if (e instanceof FetchError) {
@@ -55,7 +53,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
     loading.value = true
     try {
       // Create a session on the server
-      await $fetch('/api/auth/login', {
+      user.value = await $fetch('/api/auth/login', {
         method: 'POST',
         body: userInput,
       })
@@ -65,7 +63,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
         icon: 'i-heroicons-check-circle-20-solid',
         color: 'green',
       })
-      // Get the authenticated user with session data
+      // new request to create cookie with
       getAuthenticatedUser()
     }
     catch (e) {
@@ -98,7 +96,6 @@ export const useAuthStore = defineStore('AuthStore', () => {
     catch (error) {
       console.log(error)
     }
-
     await navigateTo('/login')
   }
 
@@ -122,22 +119,27 @@ export const useAuthStore = defineStore('AuthStore', () => {
   }
 
   // Show toast 15 min before session idle period expires
-  function checkSessionExpiration() {
-    if (!user.value)
-      return
-    if (sessionToastShown.value)
-      return
+  async function checkSessionExpiration() {
+    const sessionExpiresAt = useCookie('auth_session_expire')
+    // console.log(sessionExpiresAt.value)
 
     const now = new Date()
-    const idle = new Date(user.value.session.idlePeriodExpiresAt)
-    const diff = Math.round((idle.getTime() - now.getTime()) / 1000 / 60)
+    const diff = Math.round((Number(sessionExpiresAt.value) - now.getTime()) / 1000)
 
-    if (diff <= 15) {
+    if (diff < 0) {
+      // console.log(diff)
+      user.value = null
+      sessionToastShown.value = false
+      await navigateTo('/login')
+      return
+    }
+
+    if (!sessionToastShown.value && diff <= (15 * 60)) {
       toast.add({
-        title: `Session will expire in ${diff} minutes.`,
+        title: `Session will expire in less than 15 minutes.`,
         icon: 'i-heroicons-exclamation-triangle-20-solid',
         color: 'yellow',
-        timeout: diff * 1000 * 60,
+        timeout: diff * 1000,
         actions: [{
           label: 'Renew session',
           click: renewSession,
@@ -166,6 +168,5 @@ export const useAuthStore = defineStore('AuthStore', () => {
     userLogout,
     getAuthenticatedUser,
     checkSessionExpiration,
-    renewSession,
   }
-}, { persist: true })
+}, { persist: false })

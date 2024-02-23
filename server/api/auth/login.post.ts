@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { LuciaError } from 'lucia'
+import { eq } from 'drizzle-orm'
+import { Argon2id } from 'oslo/password'
 
 export default eventHandler(async (event) => {
   // Validate the body of the request
@@ -9,31 +10,32 @@ export default eventHandler(async (event) => {
   })
   const userData = await readValidatedBody(event, userSchema.parse)
 
-  try {
-    // find user by key and validate password
-    const key = await auth.useKey('email', userData.email.toLowerCase(), userData.password)
-    const session = await auth.createSession({
-      userId: key.userId,
-      attributes: {},
-    })
+  const user = await useDb()
+    .select()
+    .from(models.users)
+    .where(eq(models.users.email, userData.email))
+    .get()
 
-    const authRequest = auth.handleRequest(event)
-    authRequest.setSession(session)
-
-    return key.userId
-  }
-  catch (e) {
-    console.log(e)
-    if (e instanceof LuciaError && (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')) {
-      // user does not exist or password is incorrect
-      throw createError({
-        message: 'Incorrect username or password.',
-        statusCode: 400,
-      })
-    }
+  if (!user || !user.password) {
     throw createError({
-      message: 'An unknown error occurred.',
-      statusCode: 500,
+      message: 'Incorrect email or password',
+      statusCode: 400,
     })
   }
+
+  const validPassword = await new Argon2id().verify(user.password, userData.password)
+
+  if (!validPassword) {
+    throw createError({
+      message: 'Incorrect email or password',
+      statusCode: 400,
+    })
+  }
+
+  const session = await auth.createSession(user.id, {})
+  appendHeader(event, 'Set-Cookie', auth.createSessionCookie(session.id).serialize())
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { password, ...userWithoutPassword } = user
+  return userWithoutPassword
 })

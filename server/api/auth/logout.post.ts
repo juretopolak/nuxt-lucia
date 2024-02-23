@@ -1,16 +1,19 @@
+import { serializeCookie } from 'oslo/cookie'
+
 export default defineEventHandler(async (event) => {
-  const authRequest = auth.handleRequest(event)
-  // check if user is authenticated
-  const session = await authRequest.validate()
-  if (!session) {
+  if (!event.context.session) {
     throw createError({
-      message: 'Unauthorized',
-      statusCode: 401,
+      statusCode: 403,
     })
   }
-  // make sure to invalidate the current session!
-  await auth.invalidateSession(session.sessionId)
-  // delete session cookie
-  authRequest.setSession(null)
+  await auth.invalidateSession(event.context.session.id)
+  appendHeader(event, 'Set-Cookie', serializeCookie(
+    'auth_session_expire',
+    event.context.session.expiresAt.getTime().toString(),
+    {
+      expires: new Date(),
+      path: '/',
+    },
+  ))
   return sendRedirect(event, '/login')
 })

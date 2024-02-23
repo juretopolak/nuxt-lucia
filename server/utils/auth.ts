@@ -1,14 +1,16 @@
-import { betterSqlite3, d1 } from '@lucia-auth/adapter-sqlite'
+import { webcrypto } from 'node:crypto'
+import { BetterSqlite3Adapter, D1Adapter } from '@lucia-auth/adapter-sqlite'
 import Database from 'better-sqlite3'
-import { lucia } from 'lucia'
-import { h3 } from 'lucia/middleware'
+import { Lucia, TimeSpan } from 'lucia'
+import { GitHub } from 'arctic'
 import 'lucia/polyfill/node'
 import { join } from 'pathe'
-import { github } from '@lucia-auth/oauth/providers'
+import type { SelectUser } from '~/server/db/schema'
+
+globalThis.crypto = webcrypto as Crypto
 
 const tables = {
   user: 'users',
-  key: 'user_keys',
   session: 'user_sessions',
 }
 
@@ -16,38 +18,48 @@ let adapter
 
 if (process.env.DB) {
   // d1 in production
-  adapter = d1(process.env.DB, tables)
+  adapter = new D1Adapter(process.env.DB, tables)
 }
 else if (process.dev) {
   // local sqlite in development
   const { dbDir } = useRuntimeConfig()
   const sqlite = new Database(join(dbDir, './db.sqlite'))
-  adapter = betterSqlite3(sqlite, tables)
+  adapter = new BetterSqlite3Adapter(sqlite, tables)
 }
 else {
   throw new Error('No database configured for production')
 }
 
-export const auth = lucia({
-  env: process.dev ? 'DEV' : 'PROD',
-  middleware: h3(),
-  adapter,
-  getUserAttributes: (data) => {
+export const auth = new Lucia(adapter, {
+  sessionExpiresIn: new TimeSpan(1, 'd'), // 1 day
+  sessionCookie: {
+    attributes: {
+      // set to `true` when using HTTPS
+      secure: !import.meta.dev,
+    },
+  },
+  getUserAttributes: (attributes) => {
     return {
-      githubUsername: data.username,
+      email: attributes.email,
     }
   },
-  sessionExpiresIn: {
-    activePeriod: 1 * 60 * 60 * 1000, // 1 hour after creating session
-    idlePeriod: 23 * 60 * 60 * 1000, // 24 hours after creating session
-  },
 })
 
+declare module 'lucia' {
+  interface Register {
+    Lucia: typeof auth
+    DatabaseUserAttributes: SelectUser
+  }
+}
 const runtimeConfig = useRuntimeConfig()
 
-export const githubAuth = github(auth, {
-  clientId: runtimeConfig.githubClientId,
-  clientSecret: runtimeConfig.githubClientSecret,
-})
+export const github = new GitHub(runtimeConfig.githubClientId, runtimeConfig.githubClientSecret)
+
+// const runtimeConfig = useRuntimeConfig()
+
+// export const githubAuth = github(auth, {
+//   clientId: runtimeConfig.githubClientId,
+//   clientSecret: runtimeConfig.githubClientSecret,
+// })
 
 export type Auth = typeof auth

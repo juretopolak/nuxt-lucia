@@ -4,8 +4,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   const auth = useAuthStore()
   nuxtApp.hook('app:mounted', () => {
     auth.getAuthenticatedUser()
+
+    auth.checkSessionExpiration()
     setInterval(() => {
       auth.checkSessionExpiration()
-    }, 1000 * 60)
+    }, 1000)
   })
 })

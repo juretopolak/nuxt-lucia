@@ -1,32 +1,29 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
-import { blob, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  email: text('email').notNull().unique(),
-  username: text('username').unique(),
+  id: text('id').notNull().primaryKey(),
   name: text('name'),
+  email: text('email').unique(),
+  password: text('password'),
 })
 
 export const userSessions = sqliteTable('user_sessions', {
-  id: text('id').primaryKey(),
+  id: text('id').notNull().primaryKey(),
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  activeExpires: blob('active_expires', {
-    mode: 'bigint',
-  }).notNull(),
-  idleExpires: blob('idle_expires', {
-    mode: 'bigint',
-  }).notNull(),
+  expiresAt: integer('expires_at').notNull(),
 })
 
-export const userKeys = sqliteTable('user_keys', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  hashedPassword: text('hashed_password'),
+export const oauthAccounts = sqliteTable('oauth_accounts', {
+  providerId: text('provider_id').notNull(),
+  providerUserId: text('provider_user_id').notNull(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.providerId, table.providerUserId] }),
+  }
 })
 
 export type InsertUser = InferInsertModel<typeof users>

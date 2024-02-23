@@ -1,16 +1,23 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "a7d4a53e-36d3-4b60-af3e-4c12e84d1ba7",
+  "id": "99ccbf82-3708-4dbd-bdae-bdb2f66a3b00",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "user_keys": {
-      "name": "user_keys",
+    "oauth_accounts": {
+      "name": "oauth_accounts",
       "columns": {
-        "id": {
-          "name": "id",
+        "provider_id": {
+          "name": "provider_id",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_user_id": {
+          "name": "provider_user_id",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -20,20 +27,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "hashed_password": {
-          "name": "hashed_password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "user_keys_user_id_users_id_fk": {
-          "name": "user_keys_user_id_users_id_fk",
-          "tableFrom": "user_keys",
+        "oauth_accounts_user_id_users_id_fk": {
+          "name": "oauth_accounts_user_id_users_id_fk",
+          "tableFrom": "oauth_accounts",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -45,7 +45,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "oauth_accounts_provider_id_provider_user_id_pk": {
+          "columns": [
+            "provider_id",
+            "provider_user_id"
+          ],
+          "name": "oauth_accounts_provider_id_provider_user_id_pk"
+        }
+      },
       "uniqueConstraints": {}
     },
     "user_sessions": {
@@ -65,16 +73,9 @@
           "notNull": true,
           "autoincrement": false
         },
-        "active_expires": {
-          "name": "active_expires",
-          "type": "blob",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "idle_expires": {
-          "name": "idle_expires",
-          "type": "blob",
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -109,22 +110,37 @@
           "notNull": true,
           "autoincrement": false
         },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}

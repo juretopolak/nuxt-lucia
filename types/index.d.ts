@@ -12,10 +12,12 @@ declare global {
     password: string
   }
 
-  interface UserState extends SelectUser {
-    session: {
-      activePeriodExpiresAt: string
-      idlePeriodExpiresAt: string
-    }
+  interface GitHubUser {
+    id: string
+    name: string
+    email: string
+    avatar_url: string
   }
+
+  type UserState = Omit<SelectUser, 'password'> | null
 }

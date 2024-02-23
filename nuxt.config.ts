@@ -16,10 +16,12 @@ export default defineNuxtConfig({
     githubClientId: '',
     githubClientSecret: '',
   },
-  nitro: {
-    moduleSideEffects: ['lucia/polyfill/node'],
-  },
   ui: {
     icons: ['mdi'],
+  },
+  vite: {
+    optimizeDeps: {
+      exclude: ['oslo'],
+    },
   },
 })
